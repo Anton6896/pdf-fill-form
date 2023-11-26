@@ -23,7 +23,8 @@ data class Result(
 )
 
 fun loadFromDocument(document: Document): PDDocument {
-    return PDDocument.load(document.asByteArray())
+//    return Loader.loadPDF(document.asByteArray());
+    return PDDocument.load(document.asByteArray()) // v2.0.25
 }
 
 fun saveToDocument(pdf: PDDocument): Document {
@@ -54,12 +55,15 @@ fun Application.addValues() {
                     Failure(result.reason)
                 )
             }
-
         }
     }
 }
 
-
+/*
+* get fields ...
+* https://stackoverflow.com/questions/50609478/how-to-substitute-missing-font-when-filling-a-form-with-pdfbox
+*
+* */
 class Processor(private val requestId: String) {
     fun addText(document: Document): Result {
         LOGGER.info { "$requestId: handling pdf-add values" }
@@ -67,13 +71,21 @@ class Processor(private val requestId: String) {
         loadFromDocument(document).use { pdfDocument ->
 
             /* todo get all inputs in this file*/
-            val docCatalog = pdfDocument.getDocumentCatalog()
-//            val acroForm = docCatalog.getAcroForm()
-            val acroForm = docCatalog.acroForm
+//            val docCatalog = pdfDocument.getDocumentCatalog()
+//            val acroForm = docCatalog.acroForm
+            val acroForm = pdfDocument.documentCatalog.acroForm
             val fields = acroForm.getFields()
+
+            val names = arrayOf("fill_10", "fill_11", "fill_12")  // manual naming for this testing
+
             for (field in fields) {
-//                LOGGER.info { "$requestId: field $field" }
-                list(field)
+//                list(field)
+                val inputName = field.getFullyQualifiedName()
+                val found = Arrays.stream(names).anyMatch { t -> t == inputName }
+                if (found) {
+                    LOGGER.info { "$requestId: updating value in $inputName" }
+                    field.setValue("newval $inputName")
+                }
             }
 
             val data = saveToDocument(pdfDocument)
@@ -82,11 +94,7 @@ class Processor(private val requestId: String) {
     }
 
     private fun list(field: PDField) {
-//        println(field.getFullyQualifiedName())
-//        println(field.partialName)
-
         LOGGER.info { "$requestId: field: ${field.getFullyQualifiedName()} -> ${field.valueAsString}" }
-
         if (field is PDNonTerminalField) {
             for (child in field.getChildren()) {
                 list(child)

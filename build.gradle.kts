@@ -34,6 +34,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.apache.pdfbox:pdfbox:2.0.25")
+//    implementation("org.apache.pdfbox:pdfbox:3.0.0")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
     testImplementation("io.ktor:ktor-server-tests-jvm")
