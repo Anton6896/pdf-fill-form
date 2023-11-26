@@ -63,6 +63,8 @@ fun Application.addValues() {
 * get fields ...
 * https://stackoverflow.com/questions/50609478/how-to-substitute-missing-font-when-filling-a-form-with-pdfbox
 *
+* setValue
+* https://stackoverflow.com/questions/14582478/how-to-set-a-value-in-pdf-form-using-java-pdfbox-api?rq=4
 * */
 class Processor(private val requestId: String) {
     fun addText(document: Document): Result {
@@ -84,7 +86,7 @@ class Processor(private val requestId: String) {
                 val found = Arrays.stream(names).anyMatch { t -> t == inputName }
                 if (found) {
                     LOGGER.info { "$requestId: updating value in $inputName" }
-                    field.setValue("newval $inputName")
+                    field.setValue("newval-$inputName")
                 }
             }
 
@@ -94,7 +96,7 @@ class Processor(private val requestId: String) {
     }
 
     private fun list(field: PDField) {
-        LOGGER.info { "$requestId: field: ${field.getFullyQualifiedName()} -> ${field.valueAsString}" }
+        LOGGER.info { "$requestId: field: ${field.getFullyQualifiedName()} | ${field.partialName} -> ${field.valueAsString}" }
         if (field is PDNonTerminalField) {
             for (child in field.getChildren()) {
                 list(child)

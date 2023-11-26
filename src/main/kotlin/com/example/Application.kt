@@ -6,7 +6,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
 fun main() {
-    System.setProperty("io.ktor.development", "true")
+//    System.setProperty("io.ktor.development", "true")
 
     embeddedServer(
         Netty,
